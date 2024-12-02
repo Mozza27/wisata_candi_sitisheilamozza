@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class SignInScreen extends StatefulWidget {
   const  SignInScreen({super.key});
 
@@ -19,6 +20,27 @@ class _SignInScreenState extends State<SignInScreen> {
   String _errorText = '';
   bool _isSignedIn = false;
   bool _obscurePassword = true;
+  Future<Map<String, String>>  _retrieveAndDecryptDataFromPrefs(
+      Future<SharedPreferences> prefs,
+      ) async {
+    final sharedPreferences = await prefs;
+    final encyptedUsername = sharedPreferences.getString('username') ?? '';
+    final encyptedPassword = sharedPreferences.getString('password') ?? '';
+    final keyString = sharedPreferences.getString('key') ?? '';
+    final ivString = sharedPreferences.getString('iv') ?? '';
+
+    final encrypt.Key key = encrypt.Key.fromBase64(keyString);
+    final iv = encrypt.IV.fromBase64(ivString);
+
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final decryptedUsername =
+    encrypter. decrypt64(encryptedusername, iv: iv);
+    final decryptedPassword =
+    encrypter.decrypt64(encryptadPassword, iv: iv):
+
+    // Mensenbaliken date sendakriosi
+    return ('usernane': decryptedUsernane, 'password': decryptedPassword);
+  }
 
   void _signIn() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
