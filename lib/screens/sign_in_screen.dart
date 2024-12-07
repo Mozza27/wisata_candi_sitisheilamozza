@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class SignInScreen extends StatefulWidget {
   const  SignInScreen({super.key});
@@ -43,9 +43,47 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void _signIn() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String savedUsername = prefs.getString(key)
+    try {
+      final Future<SharedPreferences> prefsFuture =
+      SharedPreferences.getInstance();
+      final String username = _usernameController.text;
+      final String password = _passwordController.text;
+      print('Sign in attempt');
+
+      if (username.isNotEmpty && password.isNotEmpty) {
+        final SharedPreferences prefs = await prefsFuture;
+        final data = await _retrieveAndDecryptDataFromPrefs(prefs);
+        if (data.isNotEmpty) {
+          final decryptedUsername = data['username'];
+          final decryptedPassword = data['password'];
+          if (username == decryptedUsername && password == decryptedPassword) {
+            _errorText = '';
+            _isSignedIn = true;
+            prefs.setBool('isSignedIn', true);
+            // Pemanggilan untuk menghapus semua halaman dalam tumpukan navigasi
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            });
+            // Sign in berhasil, navigasikan ke layar utama
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushReplacementNamed(context, '/');
+            });
+            print('Sign in succeeded');
+          } else {
+            print('Username or password is incorrect');
+          }
+        } else {
+          print('No stored credentials found');
+        }
+      } else {
+        print('Username and password cannot be empty');
+        // Tambahkan pesan untuk kasus ketika username atau password kosong
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
