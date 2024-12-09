@@ -24,8 +24,8 @@ class _SignInScreenState extends State<SignInScreen> {
       Future<SharedPreferences> prefs,
       ) async {
     final sharedPreferences = await prefs;
-    final encyptedUsername = sharedPreferences.getString('username') ?? '';
-    final encyptedPassword = sharedPreferences.getString('password') ?? '';
+    final encryptedUsername = sharedPreferences.getString('username') ?? '';
+    final encryptedPassword = sharedPreferences.getString('password') ?? '';
     final keyString = sharedPreferences.getString('key') ?? '';
     final ivString = sharedPreferences.getString('iv') ?? '';
 
@@ -34,12 +34,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
     final decryptedUsername =
-    encrypter. decrypt64(encryptedusername, iv: iv);
+    encrypter. decrypt64(encryptedUsername, iv: iv);
     final decryptedPassword =
-    encrypter.decrypt64(encryptadPassword, iv: iv):
+    encrypter.decrypt64(encryptedPassword, iv: iv);
 
     // Mensenbaliken date sendakriosi
-    return ('usernane': decryptedUsernane, 'password': decryptedPassword);
+    return ('username': decryptedUsername, 'password': decryptedPassword);
   }
 
   void _signIn() async {
